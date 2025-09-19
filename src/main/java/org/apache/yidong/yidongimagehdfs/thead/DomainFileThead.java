@@ -45,7 +45,7 @@ public class DomainFileThead implements Callable<String> {
                     try {
                         processline(line, fileStatisticsHashMap);
                     }catch (Exception e){
-                        log.error("error process line{}",line,e);
+                        log.error("error process line{},filename:{}",line,file,e);
                     }
                 }
             } catch (IOException e) {

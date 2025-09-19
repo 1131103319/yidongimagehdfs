@@ -1,25 +1,23 @@
-2025-09-18 16:57:11.301  INFO 8098 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : Starting YidongimagehdfsApplicationTests using Java 1.8.0_432 on macbook-pro with PID 8098 (started by wohaocai in /Users/wohaocai/IdeaProjects/yidongimagehdfs)
-2025-09-18 16:57:11.310  INFO 8098 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : No active profile set, falling back to 1 default profile: "default"
-2025-09-18 16:57:11.877  INFO 8098 --- [main] o.a.y.y.service.DomainService            : domainsourcedir: /mnt/disk27/edits
-2025-09-18 16:57:11.877  INFO 8098 --- [main] o.a.y.y.service.DomainService            : domainoutdir: /mnt/disk27/images
-2025-09-18 16:57:11.877  INFO 8098 --- [main] o.a.y.y.service.DomainService            : domainhdfsdir: hdfs://nameservice1/tmp/mobile/result_domain/domain_collect_tmp_new_0
-2025-09-18 16:57:11.878  INFO 8098 --- [main] o.a.y.y.service.DomainService            : hashsize: 50
-2025-09-18 16:57:12.141  INFO 8098 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : Started YidongimagehdfsApplicationTests in 1.169 seconds (JVM running for 2.662)
-2025-09-18 16:57:56.267  INFO 8114 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : Starting YidongimagehdfsApplicationTests using Java 1.8.0_432 on macbook-pro with PID 8114 (started by wohaocai in /Users/wohaocai/IdeaProjects/yidongimagehdfs)
-2025-09-18 16:57:56.268  INFO 8114 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : No active profile set, falling back to 1 default profile: "default"
-2025-09-18 16:57:56.786  INFO 8114 --- [main] o.a.y.y.service.DomainService            : domainsourcedir: /mnt/disk27/edits
-2025-09-18 16:57:56.786  INFO 8114 --- [main] o.a.y.y.service.DomainService            : domainoutdir: /mnt/disk27/images
-2025-09-18 16:57:56.786  INFO 8114 --- [main] o.a.y.y.service.DomainService            : domainhdfsdir: hdfs://nameservice1/tmp/mobile/result_domain/domain_collect_tmp_new_0
-2025-09-18 16:57:56.786  INFO 8114 --- [main] o.a.y.y.service.DomainService            : hashsize: 50
-2025-09-18 16:57:57.038  INFO 8114 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : Started YidongimagehdfsApplicationTests in 1.091 seconds (JVM running for 2.225)
-2025-09-18 16:58:57.272  WARN 8114 --- [SpringApplicationShutdownHook] o.s.s.c.ThreadPoolTaskScheduler          : Timed out while waiting for executor 'taskScheduler' to terminate
-2025-09-18 16:59:57.275  WARN 8114 --- [SpringApplicationShutdownHook] o.s.s.c.ThreadPoolTaskScheduler          : Timed out while waiting for executor 'taskScheduler' to terminate
-2025-09-18 17:04:10.168  INFO 8197 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : Starting YidongimagehdfsApplicationTests using Java 1.8.0_432 on macbook-pro with PID 8197 (started by wohaocai in /Users/wohaocai/IdeaProjects/yidongimagehdfs)
-2025-09-18 17:04:10.170  INFO 8197 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : No active profile set, falling back to 1 default profile: "default"
-2025-09-18 17:04:10.710  INFO 8197 --- [main] o.a.y.y.service.DomainService            : domainsourcedir: /mnt/disk27/edits
-2025-09-18 17:04:10.710  INFO 8197 --- [main] o.a.y.y.service.DomainService            : domainoutdir: /mnt/disk27/images
-2025-09-18 17:04:10.710  INFO 8197 --- [main] o.a.y.y.service.DomainService            : domainhdfsdir: hdfs://nameservice1/tmp/mobile/result_domain/domain_collect_tmp_new_0
-2025-09-18 17:04:10.710  INFO 8197 --- [main] o.a.y.y.service.DomainService            : hashsize: 50
-2025-09-18 17:04:10.965  INFO 8197 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : Started YidongimagehdfsApplicationTests in 1.172 seconds (JVM running for 2.597)
-2025-09-18 17:05:01.001  INFO 8197 --- [my-scheduler-1] o.a.y.y.service.DomainService            : no file found
-2025-09-18 17:05:11.266  WARN 8197 --- [SpringApplicationShutdownHook] o.s.s.c.ThreadPoolTaskScheduler          : Timed out while waiting for executor 'taskScheduler' to terminate
+2025-09-19 16:45:04.608  INFO 17775 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : Starting YidongimagehdfsApplicationTests using Java 1.8.0_432 on macbook-pro with PID 17775 (started by wohaocai in /Users/wohaocai/IdeaProjects/yidongimagehdfs)
+2025-09-19 16:45:04.615  INFO 17775 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : No active profile set, falling back to 1 default profile: "default"
+2025-09-19 16:45:05.159  INFO 17775 --- [main] o.a.y.y.service.DomainService            : domainsourcedir: /mnt/disk27/edits
+2025-09-19 16:45:05.159  INFO 17775 --- [main] o.a.y.y.service.DomainService            : domainoutdir: /mnt/disk27/images
+2025-09-19 16:45:05.159  INFO 17775 --- [main] o.a.y.y.service.DomainService            : domainhdfsdir: hdfs://nameservice1/tmp/mobile/result_domain/domain_collect_tmp_new_0
+2025-09-19 16:45:05.159  INFO 17775 --- [main] o.a.y.y.service.DomainService            : hashsize: 50
+2025-09-19 16:45:05.514  INFO 17775 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : Started YidongimagehdfsApplicationTests in 1.291 seconds (JVM running for 2.827)
+2025-09-19 16:46:05.841  WARN 17775 --- [SpringApplicationShutdownHook] o.s.s.c.ThreadPoolTaskScheduler          : Timed out while waiting for executor 'taskScheduler' to terminate
+2025-09-19 16:47:05.842  WARN 17775 --- [SpringApplicationShutdownHook] o.s.s.c.ThreadPoolTaskScheduler          : Timed out while waiting for executor 'taskScheduler' to terminate
+2025-09-19 17:02:44.432  INFO 18078 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : Starting YidongimagehdfsApplicationTests using Java 1.8.0_432 on macbook-pro with PID 18078 (started by wohaocai in /Users/wohaocai/IdeaProjects/yidongimagehdfs)
+2025-09-19 17:02:44.434  INFO 18078 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : No active profile set, falling back to 1 default profile: "default"
+2025-09-19 17:02:44.995  INFO 18078 --- [main] o.a.y.y.service.DomainService            : domainsourcedir: /mnt/disk27/edits
+2025-09-19 17:02:44.995  INFO 18078 --- [main] o.a.y.y.service.DomainService            : domainoutdir: /mnt/disk27/images
+2025-09-19 17:02:44.996  INFO 18078 --- [main] o.a.y.y.service.DomainService            : domainhdfsdir: hdfs://nameservice1/tmp/mobile/result_domain/domain_collect_tmp_new_0
+2025-09-19 17:02:44.996  INFO 18078 --- [main] o.a.y.y.service.DomainService            : hashsize: 50
+2025-09-19 17:02:45.227  INFO 18078 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : Started YidongimagehdfsApplicationTests in 1.189 seconds (JVM running for 2.755)
+2025-09-19 19:03:03.130  INFO 20115 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : Starting YidongimagehdfsApplicationTests using Java 1.8.0_432 on macbook-pro with PID 20115 (started by wohaocai in /Users/wohaocai/IdeaProjects/yidongimagehdfs)
+2025-09-19 19:03:03.132  INFO 20115 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : No active profile set, falling back to 1 default profile: "default"
+2025-09-19 19:03:03.806  INFO 20115 --- [main] o.a.y.y.service.DomainService            : domainsourcedir: /mnt/disk27/edits
+2025-09-19 19:03:03.806  INFO 20115 --- [main] o.a.y.y.service.DomainService            : domainoutdir: /mnt/disk27/images
+2025-09-19 19:03:03.807  INFO 20115 --- [main] o.a.y.y.service.DomainService            : domainhdfsdir: hdfs://nameservice1/tmp/mobile/result_domain/domain_collect_tmp_new_0
+2025-09-19 19:03:03.807  INFO 20115 --- [main] o.a.y.y.service.DomainService            : hashsize: 50
+2025-09-19 19:03:04.074  INFO 20115 --- [main] o.a.y.y.YidongimagehdfsApplicationTests  : Started YidongimagehdfsApplicationTests in 1.305 seconds (JVM running for 2.904)

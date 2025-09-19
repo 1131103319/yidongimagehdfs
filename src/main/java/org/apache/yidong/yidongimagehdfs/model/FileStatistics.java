@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 public class FileStatistics {
     public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     public static final DateTimeFormatter dateTimeFormatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter dateTimeFormatter2 = DateTimeFormatter.ofPattern("yyyyMMdd");
+
     private String domain; //域名
     private String dnsipversion="";
     private String dnsip="";
