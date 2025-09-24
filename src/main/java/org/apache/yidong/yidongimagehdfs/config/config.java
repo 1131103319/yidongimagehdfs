@@ -18,7 +18,7 @@ public class config  implements SchedulingConfigurer {
     public ThreadPoolTaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         // 设置线程池大小
-        scheduler.setPoolSize(2);
+        scheduler.setPoolSize(3);
         // 设置线程名前缀，方便日志排查
         scheduler.setThreadNamePrefix("my-scheduler-");
         // 设置线程池关闭前的等待时间，确保所有任务都能完成

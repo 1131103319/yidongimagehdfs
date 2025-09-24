@@ -17,6 +17,7 @@ class YidongimagehdfsApplicationTests {
 //        System.out.println(File.separator);
         ArrayList<String> timearray = new ArrayList<>();
         for(int i=0;i<3;i++){
+            timearray.add(LocalDate.now().minusDays(i).format(FileStatistics.dateTimeFormatter1));
             timearray.add(LocalDate.now().minusDays(i).format(FileStatistics.dateTimeFormatter2));
         }
         System.out.println(timearray);

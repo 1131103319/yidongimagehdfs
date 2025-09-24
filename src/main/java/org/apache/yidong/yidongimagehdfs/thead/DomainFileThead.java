@@ -32,7 +32,7 @@ public class DomainFileThead implements Callable<String> {
         try {
             processFile();
             return file.getName();
-        }catch (Exception e){
+        } catch (Exception e) {
             return "fail";
         }
     }
@@ -44,8 +44,8 @@ public class DomainFileThead implements Callable<String> {
                 while ((line = bufferedReader.readLine()) != null) {
                     try {
                         processline(line, fileStatisticsHashMap);
-                    }catch (Exception e){
-                        log.error("error process line{},filename:{}",line,file,e);
+                    } catch (Exception e) {
+                        log.error("error process line{},filename:{}", line, file, e);
                     }
                 }
             } catch (IOException e) {
@@ -69,42 +69,46 @@ public class DomainFileThead implements Callable<String> {
         fileStatistics.setVisitcount(Long.parseLong(split[10]));
         fileStatistics.setPartition(LocalDate.parse(split[11], FileStatistics.dateTimeFormatter1));
 
-        String key = Math.abs(fileStatistics.getDomain().hashCode()) % hashsize+"_"+fileStatistics.getPartition();
-        String key1 = fileStatistics.getPartition()+"_"+fileStatistics.getDomain() + "_" + fileStatistics.getProtocoltype();
-        ConcurrentHashMap<String, FileStatistics> stringFileStatisticsConcurrentHashMap = fileStatisticsHashMap.get(key);
-        if (stringFileStatisticsConcurrentHashMap == null) {
-            ConcurrentHashMap tmp = new ConcurrentHashMap<String, FileStatistics>();
-            tmp.put(key1, fileStatistics);
-            fileStatisticsHashMap.put(key, tmp);
-        }else {
-            //如果有分区，继续判断是否有key1
-            FileStatistics o = stringFileStatisticsConcurrentHashMap.get(key1);
-            if (null == o) {
-                stringFileStatisticsConcurrentHashMap.put(key1, fileStatistics);
+        String key = Math.abs(fileStatistics.getDomain().hashCode()) % hashsize + "_" + fileStatistics.getPartition();
+        String key1 = fileStatistics.getPartition() + "_" + fileStatistics.getDomain() + "_" + fileStatistics.getProtocoltype();
+
+        fileStatisticsHashMap.compute(key, (k, v) -> {
+            if (v == null) {
+                ConcurrentHashMap<String, FileStatistics> tmp = new ConcurrentHashMap<String, FileStatistics>();
+                tmp.put(key1, fileStatistics);
+                return tmp;
             } else {
-                o.setVisitcount(fileStatistics.getVisitcount() + o.getVisitcount());
-                //todo 获取时间，判断前后
-                LocalDateTime firsttime0 = o.getFirsttime();
-                LocalDateTime firsttime1 = fileStatistics.getFirsttime();
-                LocalDateTime lasttime0 = o.getLasttime();
-                LocalDateTime lasttime1 = fileStatistics.getLasttime();
-                for (String ipv4 : fileStatistics.getDstip4list()) {
-                    o.getDstip4list().add(ipv4);
-                }
-                for (String ipv6 : fileStatistics.getDstip6list()) {
-                    o.getDstip6list().add(ipv6);
-                }
-                //todo 更新在前面的时间ip
-                if (firsttime1.isBefore(firsttime0)) {
-                    o.setFirsttime(fileStatistics.getFirsttime());
-                    o.setSrcip(fileStatistics.getSrcip());
-                    o.setDstip(fileStatistics.getDstip());
-                }
-                //todo 更新在后边的时间ip
-                if (lasttime1.isAfter(lasttime0)) {
-                    o.setLasttime(fileStatistics.getLasttime());
-                }
+                v.compute(key1, (k1, v1) -> {
+                    if (v1 == null) {
+                        return fileStatistics;
+                    } else {
+                        v1.setVisitcount(fileStatistics.getVisitcount() + v1.getVisitcount());
+                        //todo 获取时间，判断前后
+                        LocalDateTime firsttime0 = v1.getFirsttime();
+                        LocalDateTime firsttime1 = fileStatistics.getFirsttime();
+                        LocalDateTime lasttime0 = v1.getLasttime();
+                        LocalDateTime lasttime1 = fileStatistics.getLasttime();
+                        for (String ipv4 : fileStatistics.getDstip4list()) {
+                            v1.getDstip4list().add(ipv4);
+                        }
+                        for (String ipv6 : fileStatistics.getDstip6list()) {
+                            v1.getDstip6list().add(ipv6);
+                        }
+                        //todo 更新在前面的时间ip
+                        if (firsttime1.isBefore(firsttime0)) {
+                            v1.setFirsttime(fileStatistics.getFirsttime());
+                            v1.setSrcip(fileStatistics.getSrcip());
+                            v1.setDstip(fileStatistics.getDstip());
+                        }
+                        //todo 更新在后边的时间ip
+                        if (lasttime1.isAfter(lasttime0)) {
+                            v1.setLasttime(fileStatistics.getLasttime());
+                        }
+                        return v1;
+                    }
+                });
+                return v;
             }
-        }
+        });
     }
 }

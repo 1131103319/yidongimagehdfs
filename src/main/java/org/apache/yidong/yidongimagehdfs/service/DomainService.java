@@ -1,7 +1,10 @@
 package org.apache.yidong.yidongimagehdfs.service;
 
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.yidong.yidongimagehdfs.model.ApkStatistics;
 import org.apache.yidong.yidongimagehdfs.model.FileStatistics;
+import org.apache.yidong.yidongimagehdfs.thead.ApkFileThead;
 import org.apache.yidong.yidongimagehdfs.thead.DomainFileThead;
 import org.apache.yidong.yidongimagehdfs.utils.HdfsClient;
 import org.slf4j.Logger;
@@ -11,16 +14,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,16 +36,27 @@ public class DomainService {
     public String domainoutdir;
     @Value("${domainhdfsdir}")
     public String[] domainhdfsdir;
+
+    @Value("${apksourcedir}")
+    public String apksourcedir;
+    @Value("${apkoutdir}")
+    public String apkoutdir;
+    @Value("${apkhdfsdir}")
+    public String[] apkhdfsdir;
+
     @Value("${hashsize}")
     public int hashsize;
-    public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    //    public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public static String ip;
     public static ExecutorService executor = Executors.newFixedThreadPool(10);
     public static ExecutorService executor1 = Executors.newFixedThreadPool(5);
-    private volatile boolean superflag=false;
-    private volatile boolean superflag1=true;
-    private int count=0;
+    public static ExecutorService apkexecutor2 = Executors.newFixedThreadPool(5);
 
+    private volatile boolean superflag = false;
+    private volatile boolean superflag1 = true;
+    private volatile boolean apkflag = true;
+    private int count = 0;
+    private int apkcount = 0;
 
     @PostConstruct
     public void init() {
@@ -55,8 +67,13 @@ public class DomainService {
         }
         log.info("domainsourcedir: " + domainsourcedir);
         log.info("domainoutdir: " + domainoutdir);
-        log.info("domainhdfsdir: "+Arrays.asList(domainhdfsdir).get(0));
+        log.info("domainhdfsdir: " + Arrays.asList(domainhdfsdir).get(0));
         log.info("hashsize: " + hashsize);
+        log.info("ip: " + ip);
+        log.info("apksourcedir: " + apksourcedir);
+        log.info("apkoutdir: " + apkoutdir);
+        log.info("apkhdfsdir: " + Arrays.asList(apkhdfsdir).get(0));
+
         new File(domainoutdir).mkdirs();
         File outdir = new File(domainoutdir);
         if (outdir.exists()) {
@@ -71,7 +88,7 @@ public class DomainService {
 
         outdir = new File(domainoutdir);
         if (outdir.exists()) {
-            File[] outings = outdir.listFiles(f ->f.getName().contains(".process"));
+            File[] outings = outdir.listFiles(f -> f.getName().contains(".process"));
             if (outings != null) {
                 for (File tmpFile : outings) {
                     tmpFile.delete();
@@ -83,7 +100,7 @@ public class DomainService {
 
     @Scheduled(cron = "${cron}")
     public void run() {
-        superflag=true;
+        superflag = true;
         log.info("edits退出超级循环,重置状态");
         while (superflag) {
             //获取文件
@@ -92,14 +109,16 @@ public class DomainService {
             if (file.exists() && file.isDirectory()) {
                 File[] tmpfiles = file.listFiles(f -> !f.getName().endsWith(".process") && !f.getName().contains(".ing"));
                 //todo 设置是否多次执行，如果不超过2000就不执行，如果超过就直接多次执行，不再走定时
-                count=tmpfiles.length;
-                if(tmpfiles.length<2000) {
-                    superflag=false;
-                    log.info("读取到{}个文件，退出超级循环",tmpfiles.length);
-                }else{
-                    log.info("读取到{}个文件，开始超级循环",tmpfiles.length);
-                }
+
                 if (tmpfiles != null) {
+                    count = tmpfiles.length;
+                    if (tmpfiles.length < 2000) {
+                        superflag = false;
+                        log.info("读取到{}个文件，退出超级循环", tmpfiles.length);
+                    } else {
+                        log.info("读取到{}个文件，开始超级循环", tmpfiles.length);
+                    }
+
                     ArrayList<String> timearray = new ArrayList<>();
                     for (int i = 0; i < 3; i++) {
                         timearray.add(LocalDate.now().minusDays(i).format(FileStatistics.dateTimeFormatter2));
@@ -198,16 +217,24 @@ public class DomainService {
 //                log.info("delete file {}", f);
             }
             log.info(LocalDateTime.now().toString() + "本批次sourcedir处理完成");
+
+            //如果为空，可以正常退出
+            if (count <= 0) {
+                log.info("目录为空");
+                superflag = false;
+                break;
+            }
         }
     }
 
     @Scheduled(cron = "${cron1}")
     public void mergeToHdfs() {
-        while(superflag1) {
-            if (count<2000) {
-                superflag1=false;
-                log.info("源端退出超级循环,image退出超级循环{}",superflag1);
-            }else{
+        superflag1 = true;
+        while (superflag1) {
+            if (count < 2000) {
+                superflag1 = false;
+                log.info("源端退出超级循环,image退出超级循环{}", superflag1);
+            } else {
                 log.info("images开始超级循环");
             }
             File file = new File(domainoutdir);
@@ -334,32 +361,242 @@ public class DomainService {
                     }
                 }
                 log.info(LocalDateTime.now().toString() + "本批次outdir处理完成");
-                //上传文件
-                LocalDateTime now = LocalDateTime.now();
-                if (now.getHour() == 2) {
-                    LocalDate localDate = now.minusDays(1).toLocalDate();
-                    String format = localDate.format(FileStatistics.dateTimeFormatter1);
-                    File outdir = new File(domainoutdir);
-                    if (outdir.exists() && outdir.isDirectory()) {
-                        File[] files = outdir.listFiles(f -> !f.getName().endsWith(".process") && !f.getName().contains(".ing") && f.getName().contains(format) && f.getName().startsWith("new"));
-                        if (files != null) {
-                            for (File tmpFile : files) {
-                                try {
-                                    String s = tmpFile.getName().split("_")[1];
-                                    int i = Integer.parseInt(s);
-                                    HdfsClient.getFileSystem().copyFromLocalFile(true, true, new Path(tmpFile.getAbsolutePath()), new Path(domainhdfsdir[i]));
-                                    log.info("上传文件{} to {}", tmpFile.getName(), domainhdfsdir[i]);
-                                } catch (Exception e) {
-                                    log.error("上传异常{}", tmpFile.getName(), e);
-                                }
-                            }
+            }
+        }
+
+        //上传文件
+        LocalDateTime now = LocalDateTime.now();
+        if (now.getHour() == 2) {
+            LocalDate localDate = now.minusDays(1).toLocalDate();
+            String format = localDate.format(FileStatistics.dateTimeFormatter1);
+            File outdir = new File(domainoutdir);
+            if (outdir.exists() && outdir.isDirectory()) {
+                File[] files = outdir.listFiles(f -> !f.getName().endsWith(".process") && !f.getName().contains(".ing") && f.getName().contains(format) && f.getName().startsWith("new"));
+                if (files != null) {
+                    for (File tmpFile : files) {
+                        try {
+                            String s = tmpFile.getName().split("_")[1];
+                            int i = Integer.parseInt(s);
+                            HdfsClient.getFileSystem().copyFromLocalFile(true, true, new Path(tmpFile.getAbsolutePath()), new Path(domainhdfsdir[i]));
+                            log.info("上传文件{} to {}", tmpFile.getName(), domainhdfsdir[i]);
+                        } catch (Exception e) {
+                            log.error("上传异常{}", tmpFile.getName(), e);
                         }
                     }
-                    log.info("本批次上传完成" + LocalDateTime.now().toString());
+                }
+            }
+            log.info("本批次上传完成" + LocalDateTime.now().toString());
+        }
+        log.info("image退出超级循环，重置状态");
+    }
+
+    @Scheduled(cron = "${cron2}")
+    public void apkMerge() {
+        apkflag = true;
+        while (apkflag) {
+            log.info("apk文件开始处理");
+            ArrayList<File> files = new ArrayList<>();
+            File file = new File(apksourcedir);
+            if (file.exists() && file.isDirectory()) {
+                File[] tmpfiles = file.listFiles(f -> !file.getName().contains(".ing") && !file.getName().contains(".process"));
+                if (tmpfiles != null) {
+                    ArrayList<String> timearray = new ArrayList<>();
+                    for(int i=0;i<3;i++){
+                        timearray.add(LocalDate.now().minusDays(i).format(FileStatistics.dateTimeFormatter1));
+                        timearray.add(LocalDate.now().minusDays(i).format(FileStatistics.dateTimeFormatter2));
+                    }
+                    apkcount = tmpfiles.length;
+                    if (tmpfiles.length < 2000) {
+                        apkflag = false;
+                        log.info("文件数量{},无需超级循环", tmpfiles.length);
+                    }
+                    for (File tmpFile : tmpfiles) {
+                        boolean flag = false;
+                        for (String time : timearray) {
+                            if (tmpFile.getName().contains(time)) {
+                                flag = true;
+                            }
+                        }
+                        if (!flag) {
+                            tmpFile.delete();
+                            log.info("超时数据删除{}", tmpFile.getName());
+                            continue;
+                        }
+                        if (files.size() < 2000) {
+                            files.add(tmpFile);
+//                            log.info("add file {} to arrays", tmpFile.getName());
+                        }
+                    }
+                }
+            }
+            if (files.size() <= 0) {
+                log.info("apk file not found,退出");
+                return;
+            }
+
+            ArrayList<Future<String>> futures = new ArrayList<>();
+            ArrayList<String> formalArrays = new ArrayList<>();
+            ConcurrentHashMap<String, ConcurrentHashMap<String, ApkStatistics>> apkStatisticsHashMap = new ConcurrentHashMap<>();
+            for (File tmpFile : files) {
+                ApkFileThead apkFileThead = new ApkFileThead(tmpFile, apkStatisticsHashMap);
+                Future<String> submit = apkexecutor2.submit(apkFileThead);
+                futures.add(submit);
+            }
+            for (Future<String> future : futures) {
+                try {
+                    String result = future.get();
+                    if (!result.equals("fail")) {
+                        formalArrays.add(result);
+                    }
+                } catch (Exception e) {
+                    log.error("获取结果异常", e);
+                }
+            }
+            if (formalArrays.size() <= 0) {
+                log.error("本次执行未知异常,退出");
+                return;
+            }
+            //开始写出
+            for (String key : apkStatisticsHashMap.keySet()) {
+                String riqi = key;
+                String filename = apksourcedir + File.separator + riqi + "_" + ip + new Random().nextInt() + System.nanoTime() + ".process";
+                ConcurrentHashMap<String, ApkStatistics> stringApkStatisticsConcurrentHashMap = apkStatisticsHashMap.get(key);
+                if (!stringApkStatisticsConcurrentHashMap.isEmpty()) {
+                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename));) {
+                        for (ApkStatistics apkStatistics : stringApkStatisticsConcurrentHashMap.values()) {
+                            writer.write(apkStatistics.toString());
+                            writer.newLine();
+                        }
+                    } catch (IOException e) {
+                        log.error("写出异常，全部回退", e);
+                        File tmpdir = new File(apksourcedir);
+                        if (tmpdir.exists() && tmpdir.isDirectory()) {
+                            File[] tmpFiles = tmpdir.listFiles(f -> f.getName().endsWith(".process"));
+                            for (File tmpFile : tmpFiles) {
+                                tmpFile.delete();
+                                log.info("中间文件删除,{}", tmpFile.getName());
+                            }
+                        }
+                        log.info("本次执行异常，退出");
+                        return;
+                    }
+                }
+            }
+            //处理文件状态
+            File tmpdir = new File(apksourcedir);
+            if (tmpdir.exists() && tmpdir.isDirectory()) {
+                File[] tmpFiles = tmpdir.listFiles(f -> f.getName().endsWith(".process"));
+                for (File tmpFile : tmpFiles) {
+                    tmpFile.renameTo(new File(apksourcedir + File.separator + tmpFile.getName().replace(".process", "")));
+//                    log.info("更改文件状态,{}", tmpFile.getName());
+                }
+            }
+            //删除文件
+            for (String formalfile : formalArrays) {
+                new File(apksourcedir + File.separator + formalfile).delete();
+//                log.info("文件清理{}", formalfile);
+            }
+            //如果为空，可以正常退出
+            if (apkcount <= 0) {
+                log.info("目录为空");
+                apkflag = false;
+                break;
+            }
+            log.info("apk文件处理完成");
+        }
+        //上传文件
+        LocalDateTime now = LocalDateTime.now();
+        if (now.getHour() == 2) {
+            runapk();
+            log.info("本批次上传完成" + LocalDateTime.now().toString());
+        }
+    }
+
+    public void runapk() {
+        LocalDate localDate = LocalDate.now().minusDays(1);
+        String format = localDate.format(ApkStatistics.dateTimeFormatter1);
+        ArrayList<File> fileArrayList = getFile(apksourcedir, format);
+        if (fileArrayList.isEmpty()) {
+            return;
+        }
+        //写
+        String newFile = apkoutdir + File.separator + ip + "hdfs" + format + System.nanoTime() + new Random().nextInt();
+        try (
+                BufferedWriter newFilewriter = new BufferedWriter(new FileWriter(new File(newFile), true));)
+        //读
+        {
+            for (File file : fileArrayList) {
+                try (FileReader fis = new FileReader(file);
+                     BufferedReader bufferedReader = new BufferedReader(fis);
+                ) {
+                    String line = null;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        String[] split = line.split("\\|\\+\\+\\|");
+                        String tmp = "";
+                        //获取指定列进行替换
+                        if (split.length >= 12) {
+                            tmp = String.valueOf(Arrays.stream(split[12].split("\\|")).filter(k -> !k.trim().isEmpty()).distinct().count());
+                        } else {
+                            log.warn(line + "异常行");
+                            continue;
+                        }
+                        split[12] = tmp;
+                        String newLine = String.join("|++|", split);
+                        //写入
+//                        System.out.println("准备写入"+newLine);
+                        newFilewriter.write(newLine);
+                        newFilewriter.newLine();
+                    }
+
+                } catch (Exception e) {
+                    log.error("读取文件异常{}", file.getName(), e);
+                }
+                //一个文件处理完进行删除
+                boolean delete = file.delete();
+                if (!delete) {
+                    log.warn("删除文件异常{}", file.getName());
+                } else log.info("删除文件{}", file.getName());
+            }
+            //一个批次结束进行上传
+            log.info("批次结束，执行上传");
+        } catch (Exception e) {
+            log.error("本次执行异常，异常原因为", e);
+        }
+        try {
+            FileSystem fileSystem = HdfsClient.getFileSystem();
+            if (!fileSystem.exists(new Path(apkhdfsdir[0]))) {
+                fileSystem.mkdirs(new Path(apkhdfsdir[0]));
+            }
+            fileSystem.copyFromLocalFile(true, new Path(newFile), new Path(apkhdfsdir[0]));
+            log.info("文件{}上传到{}", newFile, apkhdfsdir[0]);
+        } catch (Exception e) {
+            log.error("上传异常", e);
+        }
+    }
+
+
+    public ArrayList<File> getFile(String path, String localDate) {
+        ArrayList<File> fileArrayList = new ArrayList<>();
+        File file = new File(path);
+        if (file.exists() && file.isDirectory()) {
+            File[] files = file.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    if (pathname.getName().contains(localDate)&&!pathname.getName().endsWith(".process") && !pathname.getName().contains(".ing")) {
+                        return true;
+                    }
+                    return false;
+                }
+            });
+            if (files != null) {
+                for (File file1 : files) {
+                    if (fileArrayList.size() <= 2000) {
+                        log.info("获取到文件{}", file1.getName());
+                        fileArrayList.add(file1);
+                    }
                 }
             }
         }
-        superflag1=true;
-        log.info("image退出超级循环，重置状态");
+        return fileArrayList;
     }
 }
