@@ -96,6 +96,17 @@ public class DomainService {
                 }
             }
         }
+        File apkoutfile = new File(apkoutdir);
+        File apksourcefile = new File(apksourcedir);
+        if(apkoutfile.exists()&&apksourcefile.exists()) {
+            File[] files = apkoutfile.listFiles(f -> !f.getName().contains("hdfs") && !f.getName().endsWith(".ing"));
+            if (files != null) {
+                for (File tmpFile : files) {
+                    tmpFile.renameTo(new File(apksourcedir+File.separator+tmpFile.getName()));
+                    log.info("移动file{} to {}",tmpFile.getName(),apksourcedir);
+                }
+            }
+        }
     }
 
     @Scheduled(cron = "${cron}")
@@ -567,8 +578,16 @@ public class DomainService {
             if (!fileSystem.exists(new Path(apkhdfsdir[0]))) {
                 fileSystem.mkdirs(new Path(apkhdfsdir[0]));
             }
-            fileSystem.copyFromLocalFile(true, new Path(newFile), new Path(apkhdfsdir[0]));
-            log.info("文件{}上传到{}", newFile, apkhdfsdir[0]);
+            File file = new File(apkoutdir);
+            if (file.exists()&& file.isDirectory()) {
+                File[] files = file.listFiles(f -> f.getName().contains("hdfs"));
+                if(files!=null) {
+                    for (File tmpFile : files) {
+                        fileSystem.copyFromLocalFile(true, new Path(tmpFile.getAbsolutePath()), new Path(apkhdfsdir[0]));
+                        log.info("文件{}上传到{}", newFile, apkhdfsdir[0]);
+                    }
+                }
+            }
         } catch (Exception e) {
             log.error("上传异常", e);
         }
