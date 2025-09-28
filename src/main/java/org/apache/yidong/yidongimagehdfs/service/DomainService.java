@@ -75,6 +75,7 @@ public class DomainService {
         log.info("apkhdfsdir: " + Arrays.asList(apkhdfsdir).get(0));
 
         new File(domainoutdir).mkdirs();
+        new File(apkoutdir).mkdirs();
         File outdir = new File(domainoutdir);
         if (outdir.exists()) {
             File[] outings = outdir.listFiles(f -> f.getName().endsWith(".ing"));
