@@ -78,25 +78,24 @@ public class DomainService {
         new File(apkoutdir).mkdirs();
         File outdir = new File(domainoutdir);
         if (outdir.exists()) {
-            File[] outings = outdir.listFiles(f -> f.getName().endsWith(".ing"));
+            File[] outings = outdir.listFiles(f -> f.getName().endsWith(".ing")||f.getName().endsWith(".process"));
             if (outings != null) {
                 for (File tmpFile : outings) {
                     tmpFile.delete();
-                    log.info("启动清理ing文件本批次文件 delete file {}", tmpFile.getName());
+                    log.info("启动清理ing或process文件本批次文件 delete file {}", tmpFile.getName());
+                }
+            }
+            //将处理了的文件重新处理，为了更换新程序临时用途
+            File[] outFiles = outdir.listFiles(f-> !f.getName().startsWith("new"));
+            if (outFiles != null) {
+                for (File tmpFile : outFiles) {
+                    tmpFile.renameTo(new File(domainsourcedir +File.separator + tmpFile.getName()));
+                    log.info("移动file{} to {}",tmpFile.getName(),domainsourcedir);
                 }
             }
         }
 
-        outdir = new File(domainoutdir);
-        if (outdir.exists()) {
-            File[] outings = outdir.listFiles(f -> f.getName().contains(".process"));
-            if (outings != null) {
-                for (File tmpFile : outings) {
-                    tmpFile.delete();
-                    log.info("启动清理process文件 delete file {}", tmpFile.getName());
-                }
-            }
-        }
+
         File apkoutfile = new File(apkoutdir);
         File apksourcefile = new File(apksourcedir);
         if(apkoutfile.exists()&&apksourcefile.exists()) {
@@ -133,6 +132,7 @@ public class DomainService {
 
                     ArrayList<String> timearray = new ArrayList<>();
                     for (int i = 0; i < 3; i++) {
+                        timearray.add(LocalDate.now().minusDays(i).format(FileStatistics.dateTimeFormatter1));
                         timearray.add(LocalDate.now().minusDays(i).format(FileStatistics.dateTimeFormatter2));
                     }
                     for (File tmpfile : tmpfiles) {
