@@ -38,8 +38,10 @@ public class ApkStatistics {
                         srcport + "|++|" +
                         dstip + "|++|" +
                         dstport + "|++|" +
-                        dstip4list.stream().collect(Collectors.joining("|")) + "|++|" +
-                        dstip6list.stream().collect(Collectors.joining("|")) + "|++|" +
+                        dstip4list.stream().limit(300)
+                                .collect(Collectors.joining("|")) + "|++|" +
+                        dstip6list.stream().limit(150)
+                                .collect(Collectors.joining("|")) + "|++|" +
                         firsttime.format(dateTimeFormatter) + "|++|" +
                         lasttime.format(dateTimeFormatter) + "|++|" +
                         host + "|++|" +

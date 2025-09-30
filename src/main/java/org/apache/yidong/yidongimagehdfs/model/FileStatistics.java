@@ -36,9 +36,9 @@ public class FileStatistics {
                  dnsip + "|++|" +
                  srcip + "|++|" +
                  dstip + "|++|" +
-                dstip4list.stream()
+                dstip4list.stream().limit(300)
                         .collect(Collectors.joining("|"))+"|++|" +
-                dstip6list .stream()
+                dstip6list .stream().limit(150)
                         .collect(Collectors.joining("|"))+"|++|" +
                  protocoltype + "|++|" +
                  firsttime.format(dateTimeFormatter) + "|++|" +
