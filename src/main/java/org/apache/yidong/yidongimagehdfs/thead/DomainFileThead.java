@@ -59,6 +59,8 @@ public class DomainFileThead implements Callable<String> {
         String[] split = line.split("\\|\\+\\+\\|");
         FileStatistics fileStatistics = new FileStatistics();
         fileStatistics.setDomain(split[0]);
+        fileStatistics.setDnsipversion(split[1]);
+        fileStatistics.setDnsip(split[2]);
         fileStatistics.setSrcip(split[3]);
         fileStatistics.setDstip(split[4]);
         fileStatistics.setDstip4list(new HashSet<String>(Arrays.asList(split[5].split("\\|"))));

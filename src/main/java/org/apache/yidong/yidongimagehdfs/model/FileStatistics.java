@@ -15,8 +15,8 @@ public class FileStatistics {
     public static final DateTimeFormatter dateTimeFormatter2 = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private String domain; //域名
-    private String dnsipversion="";
-    private String dnsip="";
+    private String dnsipversion;
+    private String dnsip;
     private String srcip; //首次访问该域名的源IP
     private String dstip; //首次访问该域名的目的IP
     private HashSet<String> dstip4list=new HashSet<>(); //格式为IPV4的目的IP拼接串
