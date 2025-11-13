@@ -32,10 +32,15 @@ public class DomainService {
     private static final Logger log = LoggerFactory.getLogger(DomainService.class);
     @Value("${domainsourcedir}")
     public String domainsourcedir;
+    @Value("${dnsdomainsourcedir}")
+    public String dnsdomainsourcedir;
     @Value("${domainoutdir}")
     public String domainoutdir;
     @Value("${domainhdfsdir}")
     public String[] domainhdfsdir;
+
+    @Value("${dnsdomainhdfsdir}")
+    public String[] dnsdomainhdfsdir;
 
     @Value("${apksourcedir}")
     public String apksourcedir;
@@ -66,8 +71,10 @@ public class DomainService {
             ip = "localhost";
         }
         log.info("domainsourcedir: " + domainsourcedir);
+        log.info("dnsdomainsourcedir: " + dnsdomainsourcedir);
         log.info("domainoutdir: " + domainoutdir);
         log.info("domainhdfsdir: " + Arrays.asList(domainhdfsdir).get(0));
+        log.info("dnsdomainhdfsdir: " + Arrays.asList(dnsdomainhdfsdir).get(0));
         log.info("hashsize: " + hashsize);
         log.info("ip: " + ip);
         log.info("apksourcedir: " + apksourcedir);
