@@ -72,7 +72,7 @@ public class DomainFileThead implements Callable<String> {
         fileStatistics.setPartition(LocalDate.parse(split[11], FileStatistics.dateTimeFormatter1));
 
         String key = Math.abs(fileStatistics.getDomain().hashCode()) % hashsize + "_" + fileStatistics.getPartition();
-        String key1 = fileStatistics.getPartition() + "_" + fileStatistics.getDomain() + "_" + fileStatistics.getProtocoltype();
+        String key1 = fileStatistics.getPartition() + "_" + fileStatistics.getDomain() + "_" + fileStatistics.getProtocoltype()+ "_" +fileStatistics.getDnsip();
 
         fileStatisticsHashMap.compute(key, (k, v) -> {
             if (v == null) {

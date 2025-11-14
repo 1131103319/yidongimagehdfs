@@ -409,6 +409,8 @@ public class DomainService {
         log.info("image退出超级循环，重置状态");
     }
 
+
+    //todo 处理apk文件
     @Scheduled(cron = "${cron2}")
     public void apkMerge() {
         apkflag = true;
