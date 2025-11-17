@@ -38,7 +38,7 @@ public class DomainDnsService {
 
     @Value("${hashsize}")
     public int hashsize;
-    //    public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//        public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public static String ip;
     public static ExecutorService executor = Executors.newFixedThreadPool(10);
     public static ExecutorService executor1 = Executors.newFixedThreadPool(5);
